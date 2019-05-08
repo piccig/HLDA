@@ -1,0 +1,82 @@
+&GLOBAL
+  PRINT_LEVEL LOW
+  WALLTIME 720000
+   PROJECT sn2
+  RUN_TYPE MD
+   SEED 300
+&END GLOBAL
+
+&MOTION
+
+  &MD
+   COMVEL_TOL 0.000005
+   ENSEMBLE NVT
+   STEPS 3000000 
+   TIMESTEP 0.5
+   TEMPERATURE 300.0
+
+    &THERMOSTAT
+      TYPE CSVR
+      &CSVR
+        TIMECON 100.
+      &END CSVR
+    &END THERMOSTAT
+  &END MD
+ 
+  &FREE_ENERGY
+    &METADYN
+       USE_PLUMED .TRUE.
+       PLUMED_INPUT_FILE ./plumed.dat
+    &END METADYN
+  &END FREE_ENERGY
+
+  &PRINT
+   &VELOCITIES
+    FORMAT XYZ
+   &END VELOCITIES
+  &END PRINT
+
+
+&END MOTION
+
+
+
+&FORCE_EVAL
+  METHOD Quickstep
+  &DFT
+   CHARGE -1
+    &QS
+      METHOD PM6
+      !METHOD AM1
+      &SE
+      &END SE
+    &END QS
+    &SCF
+      SCF_GUESS ATOMIC
+      EPS_SCF 1.0E-5
+      MAX_SCF 50
+       &OUTER_SCF
+          EPS_SCF 1.0E-7
+          MAX_SCF 500
+       &END
+    &END SCF
+  &END DFT
+
+
+  &SUBSYS
+    &CELL
+      ABC 10.0 10.0 10.0
+      PERIODIC NONE
+    &END CELL
+
+    &COORD
+C          5.09459        4.91798        4.93038
+Cl          5.00420        4.99636        2.06235
+Cl         3.82940        6.01611        4.33492
+H          4.89620        3.89061        4.56146
+H          6.08372        5.25871        4.56148
+Cl         5.09189        4.92023        6.86383
+     &END COORD
+   &END SUBSYS
+
+&END FORCE_EVAL

@@ -1,0 +1,96 @@
+&GLOBAL
+  PRINT_LEVEL LOW
+  WALLTIME 720000
+   PROJECT diels_alder
+  RUN_TYPE MD
+   SEED 300
+&END GLOBAL
+
+&MOTION
+
+  &MD
+   COMVEL_TOL 0.000005
+   ENSEMBLE NVT
+   STEPS 20000000 
+   TIMESTEP 0.5
+   TEMPERATURE 300.0
+
+    &THERMOSTAT
+      TYPE CSVR
+      &CSVR
+        TIMECON 100.
+      &END CSVR
+    &END THERMOSTAT
+  &END MD
+ 
+  &FREE_ENERGY
+    &METADYN
+       USE_PLUMED .TRUE.
+       PLUMED_INPUT_FILE ./plumed.dat
+    &END METADYN
+  &END FREE_ENERGY
+
+  &PRINT
+   &TRAJECTORY
+    FORMAT XYZ
+   &END TRAJECTORY
+   &VELOCITIES
+    FORMAT XYZ
+   &END VELOCITIES
+   &RESTART
+    ADD_LAST SYMBOLIC
+  &END PRINT
+
+
+&END MOTION
+
+
+
+&FORCE_EVAL
+  METHOD Quickstep
+  &DFT
+    &QS
+      METHOD PM6
+      &SE
+      &END SE
+    &END QS
+    &SCF
+      SCF_GUESS ATOMIC
+      EPS_SCF 1.0E-5
+      MAX_SCF 50
+       &OUTER_SCF
+          EPS_SCF 1.0E-7
+          MAX_SCF 500
+       &END
+    &END SCF
+  &END DFT
+
+
+  &SUBSYS
+    &CELL
+      ABC 15.0 15.0 15.0
+      PERIODIC NONE
+    &END CELL
+
+
+    &COORD
+C         -2.86413        1.47949        0.12222
+C         -3.86832        0.45959       -0.00114
+C         -3.67277       -0.86541       -0.04256
+C         -2.41561       -1.55554        0.02107
+C          1.93121       -0.71800        0.44753
+C          1.59519        0.49856       -0.22221
+H         -1.47494       -1.02831        0.10350
+H         -2.40747       -2.63875       -0.01551
+H          2.91763       -0.84490        0.87766
+H          1.20562       -1.51933        0.51806
+H          0.61838        0.61889       -0.67474
+H          2.32487        1.29630       -0.29485
+H         -1.81415        1.24258        0.22827
+H         -3.16837        2.51981        0.11980
+H         -4.89172        0.82746       -0.06497
+H         -4.54698       -1.50868       -0.13564
+     &END COORD
+   &END SUBSYS
+
+&END FORCE_EVAL
